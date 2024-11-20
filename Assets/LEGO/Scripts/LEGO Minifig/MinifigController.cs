@@ -205,7 +205,10 @@ namespace Unity.LEGO.Minifig
         protected static readonly int cancelSpecialHash = Animator.StringToHash("Cancel Special");
         protected static readonly int specialIdHash = Animator.StringToHash("Special Id");
 
+
         protected Action<bool> onSpecialComplete;
+        public bool Is3D = false;
+        private GameObject cinemachineCam;
 
         protected virtual void OnValidate()
         {
@@ -231,7 +234,7 @@ namespace Unity.LEGO.Minifig
             controller = GetComponent<CharacterController>();
             animator = GetComponent<Animator>();
             audioSource = GetComponent<AudioSource>();
-
+            cinemachineCam = GameObject.Find("Third Person Free Look Camera");
             // Initialise animation.
             animator.SetBool(groundedHash, true);
 
@@ -290,18 +293,20 @@ namespace Unity.LEGO.Minifig
                             // Calculate direct speed and speed.
                             var right = Vector3.right;
                             var forward = Vector3.forward;
-                            if (Camera.main)
-                            {
-                                right = Camera.main.transform.right;
-                                right.y = 0.0f;
-                                right.Normalize();
-                                forward = Camera.main.transform.forward;
-                                forward.y = 0.0f;
-                                forward.Normalize();
-                            }
-
                             var targetSpeed = right * Input.GetAxisRaw("Horizontal");
-                            targetSpeed += forward * Input.GetAxisRaw("Vertical");
+                            if (Is3D)
+                            {
+                                targetSpeed += forward * Input.GetAxisRaw("Vertical");
+                                if (Camera.main)
+                                {
+                                    right = Camera.main.transform.right;
+                                    right.y = 0.0f;
+                                    right.Normalize();
+                                    forward = Camera.main.transform.forward;
+                                    forward.y = 0.0f;
+                                    forward.Normalize();
+                                }
+                            }
                             if (targetSpeed.sqrMagnitude > 0.0f)
                             {
                                 targetSpeed.Normalize();
