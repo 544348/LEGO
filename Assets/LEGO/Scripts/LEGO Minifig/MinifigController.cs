@@ -205,10 +205,15 @@ namespace Unity.LEGO.Minifig
         protected static readonly int cancelSpecialHash = Animator.StringToHash("Cancel Special");
         protected static readonly int specialIdHash = Animator.StringToHash("Special Id");
 
-
         protected Action<bool> onSpecialComplete;
-        public bool Is3D = false;
-        private GameObject cinemachineCam;
+
+        [Header("CameraControls")]
+        public bool is3D;
+        public GameObject cinemachineCam;
+        public GameObject Cam2D;
+        private Vector3 TargetSpeed;
+
+
 
         protected virtual void OnValidate()
         {
@@ -234,7 +239,7 @@ namespace Unity.LEGO.Minifig
             controller = GetComponent<CharacterController>();
             animator = GetComponent<Animator>();
             audioSource = GetComponent<AudioSource>();
-            cinemachineCam = GameObject.Find("Third Person Free Look Camera");
+
             // Initialise animation.
             animator.SetBool(groundedHash, true);
 
@@ -260,15 +265,15 @@ namespace Unity.LEGO.Minifig
                     case InputType.Tank:
                         {
                             // Calculate speed.
-                            var targetSpeed = Input.GetAxisRaw("Vertical");
-                            targetSpeed *= targetSpeed > 0 ? maxForwardSpeed : maxBackwardSpeed;
-                            if (targetSpeed > speed)
+                            var TargetSpeed = Input.GetAxisRaw("Vertical");
+                            TargetSpeed *= TargetSpeed > 0 ? maxForwardSpeed : maxBackwardSpeed;
+                            if (TargetSpeed > speed)
                             {
-                                speed = Mathf.Min(targetSpeed, speed + acceleration * Time.deltaTime);
+                                speed = Mathf.Min(TargetSpeed, speed + acceleration * Time.deltaTime);
                             }
-                            else if (targetSpeed < speed)
+                            else if (TargetSpeed < speed)
                             {
-                                speed = Mathf.Max(targetSpeed, speed - acceleration * Time.deltaTime);
+                                speed = Mathf.Max(TargetSpeed, speed - acceleration * Time.deltaTime);
                             }
 
                             // Calculate rotation speed.
@@ -291,32 +296,45 @@ namespace Unity.LEGO.Minifig
                     case InputType.Direct:
                         {
                             // Calculate direct speed and speed.
+                            float playersCurrentZPosition = gameObject.transform.position.z;
                             var right = Vector3.right;
                             var forward = Vector3.forward;
-                            var targetSpeed = right * Input.GetAxisRaw("Horizontal");
-                            if (Is3D)
+                            if (Camera.main)
                             {
-                                targetSpeed += forward * Input.GetAxisRaw("Vertical");
-                                if (Camera.main)
-                                {
-                                    right = Camera.main.transform.right;
-                                    right.y = 0.0f;
-                                    right.Normalize();
-                                    forward = Camera.main.transform.forward;
-                                    forward.y = 0.0f;
-                                    forward.Normalize();
-                                }
+                                right = Camera.main.transform.right;
+                                right.y = 0.0f;
+                                right.Normalize();
+                                forward = Camera.main.transform.forward;
+                                forward.y = 0.0f;
+                                forward.Normalize();
                             }
-                            if (targetSpeed.sqrMagnitude > 0.0f)
+                            if (is3D)
                             {
-                                targetSpeed.Normalize();
+                                cinemachineCam.SetActive(true);
+                                Cam2D.SetActive(false);
+                                playersCurrentZPosition = gameObject.transform.position.z;
+                                TargetSpeed = right * Input.GetAxisRaw("Horizontal");
+                                TargetSpeed += forward * Input.GetAxisRaw("Vertical");
                             }
-                            targetSpeed *= maxForwardSpeed;
+                            else
+                            {
+                                cinemachineCam.SetActive(false);
+                                Cam2D.SetActive(true);
+                                Cam2D.transform.position = new Vector3(gameObject.transform.position.x, Cam2D.transform.position.y, Cam2D.transform.position.z);
+                                cinemachineCam.transform.position = Cam2D.transform.position;
+                                TargetSpeed = Vector3.right * Input.GetAxisRaw("Horizontal");
+                            }
+                            
+                            if (TargetSpeed.sqrMagnitude > 0.0f)
+                            {
+                                TargetSpeed.Normalize();
+                            }
+                            TargetSpeed *= maxForwardSpeed;
 
-                            var speedDiff = targetSpeed - directSpeed;
+                            var speedDiff = TargetSpeed - directSpeed;
                             if (speedDiff.sqrMagnitude < acceleration * acceleration * Time.deltaTime * Time.deltaTime)
                             {
-                                directSpeed = targetSpeed;
+                                directSpeed = TargetSpeed;
                             }
                             else if (speedDiff.sqrMagnitude > 0.0f)
                             {
@@ -328,9 +346,9 @@ namespace Unity.LEGO.Minifig
 
                             // Calculate rotation speed - ignore rotate acceleration.
                             rotateSpeed = 0.0f;
-                            if (targetSpeed.sqrMagnitude > 0.0f)
+                            if (TargetSpeed.sqrMagnitude > 0.0f)
                             {
-                                var localTargetSpeed = transform.InverseTransformDirection(targetSpeed);
+                                var localTargetSpeed = transform.InverseTransformDirection(TargetSpeed);
                                 var angleDiff = Vector3.SignedAngle(Vector3.forward, localTargetSpeed.normalized, Vector3.up);
 
                                 if (angleDiff > 0.0f)
@@ -889,20 +907,20 @@ namespace Unity.LEGO.Minifig
             var breakDistance = (speed * speed) / (2.0f * acceleration);
 
             // If breaking before target, only set target speed if still possible to break.
-            var targetSpeed = 0.0f;
+            var TargetSpeed = 0.0f;
             if (!breakBeforeTarget || direction.magnitude - minDistance > breakDistance + distanceEpsilon)
             {
-                targetSpeed = speedMultiplier * maxForwardSpeed;
+                TargetSpeed = speedMultiplier * maxForwardSpeed;
             }
 
             // Adjust speed based on target speed.
-            if (targetSpeed > speed)
+            if (TargetSpeed > speed)
             {
-                speed = Mathf.Min(targetSpeed, speed + acceleration * Time.deltaTime);
+                speed = Mathf.Min(TargetSpeed, speed + acceleration * Time.deltaTime);
             }
-            else if (targetSpeed < speed)
+            else if (TargetSpeed < speed)
             {
-                speed = Mathf.Max(targetSpeed, speed - acceleration * Time.deltaTime);
+                speed = Mathf.Max(TargetSpeed, speed - acceleration * Time.deltaTime);
             }
 
             // Calculate move delta - prevent overshoot by limiting speed.
