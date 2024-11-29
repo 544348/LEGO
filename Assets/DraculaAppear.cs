@@ -4,15 +4,33 @@ using UnityEngine;
 
 public class DraculaAppear : MonoBehaviour
 {
-    // Start is called before the first frame update
-    void Start()
+    [Header("Target GameObject")]
+    [Tooltip("The GameObject to activate after the delay.")]
+    public GameObject targetObject;
+
+    [Header("Activation Delay")]
+    [Tooltip("Time in seconds before the target GameObject is activated.")]
+    public float delay = 5f;
+
+    private void Start()
     {
-        
+        if (targetObject != null)
+        {
+            // Start the activation process
+            StartCoroutine(ActivateObjectAfterDelay());
+        }
+        else
+        {
+            Debug.LogWarning("Target object is not assigned!", this);
+        }
     }
 
-    // Update is called once per frame
-    void Update()
+    private System.Collections.IEnumerator ActivateObjectAfterDelay()
     {
-        
+        // Wait for the specified delay
+        yield return new WaitForSeconds(delay);
+
+        // Activate the target object
+        targetObject.SetActive(true);
     }
 }

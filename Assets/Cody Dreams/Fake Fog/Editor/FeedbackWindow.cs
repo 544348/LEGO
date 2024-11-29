@@ -18,7 +18,7 @@ namespace CodyDreams
             static FeedbackWindow()
             {
                 // Read preference immediately upon load
-                showOnStartup = EditorPrefs.GetBool("ShowFeedbackWindowOnStartup", true);
+               
                 // Show the feedback window on startup based on preference
                 if (showOnStartup)
                 {
