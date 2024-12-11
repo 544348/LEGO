@@ -10,37 +10,49 @@ public class movementNPC : MonoBehaviour
     public bool spawnFromLeft;
     private Rigidbody rb;
     public float speed;
-
+    private bool NPChasStopped;
+    private Animator anim;
 
     void Start()
     {
         Player = GameObject.Find("Player Minifig"); 
         rb = GetComponent<Rigidbody>();
-        if (spawnFromLeft)
-        {
-            rb.MoveRotation(Quaternion.Euler(-transform.right));
-        }
-        else
-        {
-            rb.MoveRotation(Quaternion.Euler(transform.right));
-        }
+        anim = GetComponent<Animator>();
         
     }
 
     // Update is called once per frame
+    private void OnTriggerEnter(Collider other)
+    {
+        if(other.gameObject.tag == "NPCstopper")
+        {
+            anim.SetTrigger("Fall");
+            StartCoroutine(delayedStop());
+        }
+    }
+    private IEnumerator delayedStop()
+    {
+        yield return new WaitForSeconds(1);
+        NPChasStopped = true;
+        rb.velocity = Vector3.zero;
+
+    }
     void Update()
     {
-        gameObject.transform.LookAt(Player.transform);
-        if (spawnFromLeft)
+        if (!NPChasStopped)
         {
-          //  gameObject.transform.eulerAngles = -Vector3.right;
-            rb.velocity = transform.forward * speed;
-            Debug.Log("spawnFromLeft code is running");
+            if (spawnFromLeft)
+            {
+                //  gameObject.transform.eulerAngles = -Vector3.right;
+                rb.velocity = transform.forward * speed;
+                Debug.Log("spawnFromLeft code is running");
+            }
+            else
+            {
+                //  gameObject.transform.eulerAngles = Vector3.right;
+                rb.velocity = transform.forward * speed;
+            }
         }
-        else
-        {
-          //  gameObject.transform.eulerAngles = Vector3.right;
-            rb.velocity = transform.forward * speed;
-        }
+       
     }
 }

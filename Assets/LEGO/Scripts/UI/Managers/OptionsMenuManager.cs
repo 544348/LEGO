@@ -89,12 +89,17 @@ namespace Unity.LEGO.UI
 
             if (m_Menu.activeSelf)
             {
+                Cursor.lockState = CursorLockMode.None;
+                Cursor.visible = true;
+
                 Time.timeScale = 0f;
 
                 EventSystem.current.SetSelectedGameObject(null);
             }
             else
             {
+                Cursor.lockState = CursorLockMode.Locked;
+                Cursor.visible = false;
                 Time.timeScale = 1f;
             }
 

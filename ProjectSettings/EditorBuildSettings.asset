@@ -12,7 +12,7 @@ EditorBuildSettings:
     path: Assets/LEGO/ScenesMICROGAMES/LEGO Tutorial.unity
     guid: c117ceea613454843a1d1c28c25d7a94
   - enabled: 0
-    path: Assets/LEGO/ScenesMICROGAMES/Cutscene scenes/Cutscene0---.unity
+    path: Assets/LEGO/ScenesMICROGAMES/Cutscene scenes/Cutscene01.unity
     guid: 62b780d2cda8a32449d797cda6330677
   - enabled: 1
     path: Assets/Cutscene05.unity
@@ -35,6 +35,9 @@ EditorBuildSettings:
   - enabled: 0
     path: Assets/LEGO/ScenesMICROGAMES/Cutscene scenes/wwww.unity
     guid: 93a6f3bef1032b1478debe9f76ee56fe
+  - enabled: 1
+    path: Assets/LEGO/ScenesMICROGAMES/Blood Sucking microgame.unity
+    guid: 5e5c4916045cfca4b94d00694cb54b70
   - enabled: 1
     path: Assets/LEGO/ScenesMICROGAMES/Menu Intro.unity
     guid: 77504b30d92956e4ab45b9e740f2d454

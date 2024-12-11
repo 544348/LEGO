@@ -49,6 +49,8 @@ namespace Unity.LEGO.UI
         {
             if (!m_GameOver)
             {
+                Cursor.lockState = CursorLockMode.None;
+                Cursor.visible = true;
                 m_CanvasGroup.gameObject.SetActive(true);
                 m_GameOver = true;
                 m_Won = evt.Win;
