@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Net.Sockets;
+using System.Runtime.CompilerServices;
 using UnityEngine;
 
 public class movementNPC : MonoBehaviour
@@ -12,7 +13,8 @@ public class movementNPC : MonoBehaviour
     public float speed;
     private bool NPChasStopped;
     private Animator anim;
-
+    public float delayedFall;
+    public bool hasBeenCounted;
     void Start()
     {
         Player = GameObject.Find("Player Minifig"); 
@@ -22,20 +24,30 @@ public class movementNPC : MonoBehaviour
     }
 
     // Update is called once per frame
-    private void OnTriggerEnter(Collider other)
-    {
-        if(other.gameObject.tag == "NPCstopper")
-        {
-            anim.SetTrigger("Fall");
-            StartCoroutine(delayedStop());
-        }
+      private void OnTriggerEnter(Collider other)
+      {
+          if(other.gameObject.tag == "NPCstopper")
+          {
+              
+              anim.SetTrigger("Fall");
+              StartCoroutine(delayedStop());
+              
+          }
+      }
+      private IEnumerator delayedStop()
+      {
+          yield return new WaitForSeconds(delayedFall);
+          NPChasStopped = true;
+          rb.velocity = transform.forward * 1.0f;
+          StopAllCoroutines(); 
     }
-    private IEnumerator delayedStop()
-    {
-        yield return new WaitForSeconds(1);
-        NPChasStopped = true;
-        rb.velocity = Vector3.zero;
 
+    private void OnCollisionEnter(Collision collision)
+    {
+        if (collision.gameObject.tag == "Player")
+        {
+            Debug.Log("NPC has touched the player");
+        }
     }
     void Update()
     {
@@ -53,6 +65,9 @@ public class movementNPC : MonoBehaviour
                 rb.velocity = transform.forward * speed;
             }
         }
-       
+        else
+        {
+            rb.velocity = transform.forward * 0.0f;
+        }
     }
 }
