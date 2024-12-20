@@ -64,6 +64,11 @@ public class movementNPC : MonoBehaviour
                 //  gameObject.transform.eulerAngles = Vector3.right;
                 rb.velocity = transform.forward * speed;
             }
+            
+            if(hasBeenCounted)
+            {
+               // gameObject.SetActive(false);
+            }
         }
         else
         {

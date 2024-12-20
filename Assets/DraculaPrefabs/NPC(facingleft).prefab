@@ -3555,7 +3555,7 @@ MonoBehaviour:
   Player: {fileID: 0}
   spawnFromLeft: 1
   speed: 10
-  delayedFall: 0
+  delayedFall: 0.5
   hasBeenCounted: 0
 --- !u!54 &1674633459031423477
 Rigidbody:
